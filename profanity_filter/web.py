@@ -1,5 +1,6 @@
 """RESTful web service for profanity filtering"""
 
+import logging
 import pathlib
 from contextlib import suppress
 
@@ -11,6 +12,7 @@ from profanity_filter.config import DEFAULT_CONFIG
 from profanity_filter.profanity_filter import APP_NAME, ProfanityFilter
 from profanity_filter.types_ import Word
 
+logger = logging.getLogger(__name__)
 
 def create_profanity_filter() -> ProfanityFilter:
     app_dirs = AppDirs(APP_NAME)
@@ -36,6 +38,8 @@ async def is_profane(request: Request) -> bool:
     except Exception as err: 
         raise err
     
+    logger.debug(request_json)
+
     return pf.is_profane(request_json['text'])
 
 if __name__ == "__main__": 
