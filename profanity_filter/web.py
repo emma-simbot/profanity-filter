@@ -43,4 +43,4 @@ async def is_profane(request: Request) -> bool:
     return pf.is_profane(request_json['text'])
 
 if __name__ == "__main__": 
-    uvicorn.run(app)
+    uvicorn.run(app, host='0.0.0.0')
