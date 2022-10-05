@@ -6,7 +6,7 @@ from contextlib import suppress
 
 import uvicorn
 from appdirs import AppDirs
-from fastapi import FastAPI, Path, Request
+from fastapi import FastAPI, Path, Request, Response, status
 
 from profanity_filter.config import DEFAULT_CONFIG
 from profanity_filter.profanity_filter import APP_NAME, ProfanityFilter
@@ -26,9 +26,17 @@ app = FastAPI()
 pf = create_profanity_filter()
 
 
+@app.get('/healthcheck')
+async def root(response: Response) -> str:
+    """Ping the API to make sure it is responding."""
+    response.status_code = status.HTTP_200_OK
+    return "success"
+
+
 @app.post(path='/censor-word/{word}', response_model=Word)
 async def censor_word(word: str = Path(..., title='Word to censor', description='Word to censor')):
     return pf.censor_word(word)
+
 
 @app.post(path='/is-profane')
 async def is_profane(request: Request) -> bool:
@@ -41,6 +49,7 @@ async def is_profane(request: Request) -> bool:
     logger.debug(request_json)
 
     return pf.is_profane(request_json['text'])
+
 
 if __name__ == "__main__": 
     uvicorn.run(app, host='0.0.0.0')
