@@ -4,14 +4,15 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 from ordered_set import OrderedSet
+from profanity_filter.config import Config
+from profanity_filter.profanity_filter import DEFAULT_CONFIG, ProfanityFilter
+from profanity_filter.types_ import AnalysisType, Word
 from ruamel.yaml import YAML
 
-from profanity_filter.profanity_filter import ProfanityFilter, DEFAULT_CONFIG
-from profanity_filter.types_ import Word, AnalysisType
-from profanity_filter.config import Config
-
-from tests.conftest import (create_profane_word_dictionaries, TEST_STATEMENT, CLEAN_STATEMENT, with_config,
-                            Config as TestConfig)
+from tests.conftest import (CLEAN_STATEMENT, TEST_STATEMENT,
+                            TEST_STATEMENT_WITH_PROFANE_PHRASE)
+from tests.conftest import Config as TestConfig
+from tests.conftest import create_profane_word_dictionaries, with_config
 
 
 def compare_settings(pf0: ProfanityFilter, pf1: ProfanityFilter) -> None:
@@ -26,7 +27,6 @@ def compare_settings(pf0: ProfanityFilter, pf1: ProfanityFilter) -> None:
 
 def test_from_config():
     compare_settings(ProfanityFilter(), ProfanityFilter.from_config(DEFAULT_CONFIG))
-
 
 def test_from_yaml():
     non_existing_path = uuid.uuid4().hex
@@ -64,6 +64,11 @@ def test_censor_word(pf):
 @with_config(TestConfig())
 def test_is_profane(pf):
     assert pf.is_profane(TEST_STATEMENT)
+    assert not pf.is_profane(CLEAN_STATEMENT)
+
+@with_config(TestConfig())
+def test_is_profane_with_phrase(pf):
+    assert pf.is_profane(TEST_STATEMENT_WITH_PROFANE_PHRASE)
     assert not pf.is_profane(CLEAN_STATEMENT)
 
 

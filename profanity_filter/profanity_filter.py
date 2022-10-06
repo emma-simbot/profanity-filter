@@ -1,11 +1,13 @@
 import re
 from collections import defaultdict
-from contextlib import suppress, contextmanager
+from contextlib import contextmanager, suppress
 from copy import deepcopy
 from itertools import chain
 from math import floor
+from optparse import Option
 from pathlib import Path
-from typing import Dict, Union, List, Tuple, Set, Collection, ContextManager, Optional
+from typing import (Collection, ContextManager, Dict, List, Optional, Set,
+                    Tuple, Union)
 
 import poetry_version
 import spacy
@@ -18,11 +20,14 @@ from ordered_set import OrderedSet
 from redis import Redis
 
 from profanity_filter import spacy_utlis
-from profanity_filter.config import Config, DEFAULT_CONFIG
+from profanity_filter.config import DEFAULT_CONFIG, Config
 from profanity_filter.spacy_component import SpacyProfanityFilterComponent
-from profanity_filter.types_ import (Words, Language, ProfaneWordDictionaries, ProfaneWordDictionariesAcceptable,
-                                     Languages, LanguagesAcceptable, Nlps, Morphs, Spells, Substrings,
-                                     TextSplittedByLanguage, ProfanityFilterError, Word, AnalysisType, AnalysesTypes)
+from profanity_filter.types_ import (AnalysesTypes, AnalysisType, Language,
+                                     Languages, LanguagesAcceptable, Morphs,
+                                     Nlps, ProfaneWordDictionaries,
+                                     ProfaneWordDictionariesAcceptable,
+                                     ProfanityFilterError, Spells, Substrings,
+                                     TextSplittedByLanguage, Word, Words)
 
 
 class DummyHunSpell:
@@ -106,6 +111,9 @@ class ProfanityFilter:
         else:
             self._DATA_DIR: Path = data_dir
 
+        profane_phrases_list_filename = self._DATA_DIR.joinpath("profanity_phrases.txt")
+        self._profane_phrases_regex = self._create_phrases_regex(profane_phrases_list_filename)
+        
         self._MAX_MAX_DISTANCE = 3
 
         # Set dummy values to satisfy the linter (they will be overwritten in `config`)
@@ -214,6 +222,12 @@ class ProfanityFilter:
 
     def is_profane(self, text: str) -> bool:
         """Returns True if input_text contains any profane words, False otherwise"""
+        if self._profane_phrases_regex is not None:
+            match = self._profane_phrases_regex.search(text)
+
+            if match:
+                return True
+
         return self._censor(text=text, return_bool=True)
 
     def spacy_component(self, language: Language = None) -> str:
@@ -409,6 +423,15 @@ class ProfanityFilter:
         """ Clears all custom censor lists """
         self.custom_profane_word_dictionaries = None
         self.extra_profane_word_dictionaries = None
+
+    def _create_phrases_regex(self, profane_phrases_list_filename: Path) -> re.Pattern:
+        """Creates a regex from the list of profane phrases provided."""
+        phrases = []
+        with open(profane_phrases_list_filename) as in_file:
+            for line in in_file:
+                phrases.append(line.strip())
+        
+        return re.compile("|".join(phrases))
 
     @contextmanager
     def _disabled_cache_clearing(self) -> ContextManager[None]:
