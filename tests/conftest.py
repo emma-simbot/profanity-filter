@@ -1,16 +1,17 @@
 from collections import defaultdict
 from copy import deepcopy
-from dataclasses import replace, dataclass
+from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import Tuple
 
 import dill
 import pytest
 import spacy.language
 from ordered_set import OrderedSet
-
-from profanity_filter.profanity_filter import ProfanityFilter
-from profanity_filter.types_ import ProfaneWordDictionaries, AnalysesTypes, Language
 from profanity_filter import Config
+from profanity_filter.profanity_filter import ProfanityFilter
+from profanity_filter.types_ import (AnalysesTypes, Language,
+                                     ProfaneWordDictionaries)
 
 
 @dataclass
@@ -69,4 +70,5 @@ def with_config(config: Config):
 
 
 TEST_STATEMENT = "Hey, I like unicorns, chocolate, oranges and man's blood, turd!"
+TEST_STATEMENT_WITH_PROFANE_PHRASE = "Hey, cut your arm"
 CLEAN_STATEMENT = "Hey there, I like chocolate too mate."
