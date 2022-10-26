@@ -132,7 +132,6 @@ dmypy.json
 pyvenv.cfg
 pip-selfcheck.json
 
-
 # End of https://www.gitignore.io/api/python
 
 # Created by https://www.gitignore.io/api/jetbrains
@@ -213,5 +212,6 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
-
 # End of https://www.gitignore.io/api/jetbrains
+
+.envrc

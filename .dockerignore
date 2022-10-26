@@ -1,0 +1,12 @@
+storage/
+tests/
+data/
+/.*
+*.lock
+*.ini
+*.toml
+*.md
+!README.md
+!pyproject.toml
+!poetry.lock
+**/*_*cache*_*
