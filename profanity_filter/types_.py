@@ -1,6 +1,7 @@
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Dict, Collection, Generator, Tuple, List, FrozenSet, Union
+from typing import (Collection, Dict, FrozenSet, Generator, List, Optional,
+                    Tuple, Union)
 
 import spacy.language
 from pydantic import BaseModel

@@ -4,7 +4,6 @@ from contextlib import contextmanager, suppress
 from copy import deepcopy
 from itertools import chain
 from math import floor
-from optparse import Option
 from pathlib import Path
 from typing import (Collection, ContextManager, Dict, List, Optional, Set,
                     Tuple, Union)
@@ -17,7 +16,6 @@ import spacy.tokens
 from cached_property import cached_property
 from more_itertools import substrings_indexes
 from ordered_set import OrderedSet
-from redis import Redis
 
 from profanity_filter import spacy_utlis
 from profanity_filter.config import DEFAULT_CONFIG, Config
@@ -93,7 +91,6 @@ class ProfanityFilter:
                  languages: LanguagesAcceptable = tuple(DEFAULT_CONFIG.languages),
                  *,
                  analyses: AnalysesTypes = frozenset(DEFAULT_CONFIG.analyses),
-                 cache_redis_connection_url: Optional[str] = None,
                  censor_char: str = DEFAULT_CONFIG.censor_char,
                  censor_whole_words: bool = DEFAULT_CONFIG.censor_whole_words,
                  custom_profane_word_dictionaries: ProfaneWordDictionariesAcceptable = None,
@@ -119,8 +116,6 @@ class ProfanityFilter:
         # Set dummy values to satisfy the linter (they will be overwritten in `config`)
         self._analyses: AnalysesTypes = frozenset()
         self._cache_clearing_disabled: bool = False
-        self._cache_redis: Optional[Redis] = None
-        self._cache_redis_connection_url: Optional[str] = None
         self._censor_char: str = ''
         self._censor_whole_words: bool = False
         self._custom_profane_word_dictionaries: ProfaneWordDictionaries = {}
@@ -150,7 +145,6 @@ class ProfanityFilter:
             self.config(
                 languages=languages,
                 analyses=analyses,
-                cache_redis_connection_url=cache_redis_connection_url,
                 censor_char=censor_char,
                 censor_whole_words=censor_whole_words,
                 custom_profane_word_dictionaries=custom_profane_word_dictionaries,
@@ -167,7 +161,6 @@ class ProfanityFilter:
                languages: LanguagesAcceptable = tuple(DEFAULT_CONFIG.languages),
                *,
                analyses: AnalysesTypes = frozenset(DEFAULT_CONFIG.analyses),
-               cache_redis_connection_url: Optional[str] = DEFAULT_CONFIG.cache_redis_connection_url,
                censor_char: str = DEFAULT_CONFIG.censor_char,
                censor_whole_words: bool = DEFAULT_CONFIG.censor_whole_words,
                custom_profane_word_dictionaries: ProfaneWordDictionariesAcceptable = None,
@@ -178,7 +171,6 @@ class ProfanityFilter:
                spells: Optional[Spells] = None,
                ):
         self.analyses = analyses
-        self.cache_redis_connection_url = cache_redis_connection_url
         self.censor_char = censor_char
         self.censor_whole_words = censor_whole_words
         self.custom_profane_word_dictionaries = custom_profane_word_dictionaries
@@ -197,7 +189,6 @@ class ProfanityFilter:
         return cls(
             languages=config.languages,
             analyses=frozenset(config.analyses),
-            cache_redis_connection_url=config.cache_redis_connection_url,
             censor_char=config.censor_char,
             censor_whole_words=config.censor_whole_words,
             max_relative_distance=config.max_relative_distance,
@@ -251,15 +242,6 @@ class ProfanityFilter:
         self._analyses = AVAILABLE_ANALYSES.intersection(value)
         self.clear_cache()
 
-    @property
-    def cache_redis_connection_url(self) -> Optional[str]:
-        return self._cache_redis_connection_url
-
-    @cache_redis_connection_url.setter
-    def cache_redis_connection_url(self, value: Optional[str]) -> None:
-        self._cache_redis_connection_url = value
-        if value is not None:
-            self._cache_redis = Redis.from_url(value)
 
     @property
     def censor_char(self) -> str:

@@ -10,3 +10,5 @@ data/
 !pyproject.toml
 !poetry.lock
 **/*_*cache*_*
+Dockerfile
+LICENSE

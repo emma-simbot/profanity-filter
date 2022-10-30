@@ -1,11 +1,10 @@
-from typing import List, Optional
-
 from pathlib import Path
+from typing import List
+
 from pydantic import BaseModel
 from ruamel.yaml import YAML
 
 from profanity_filter.types_ import AnalysisType, Language, PathOrStr
-
 
 _yaml = YAML(typ='safe')
 
@@ -13,7 +12,6 @@ _yaml = YAML(typ='safe')
 # noinspection PyTypeChecker
 class Config(BaseModel):
     analyses: List[AnalysisType] = list(AnalysisType)
-    cache_redis_connection_url: Optional[str] = None
     censor_char: str = '*'
     censor_whole_words: bool = True
     languages: List[Language] = ['en_core_web_sm']
