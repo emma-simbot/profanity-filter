@@ -236,7 +236,7 @@ python-versions = ">=2.7"
 name = "ordered-set-stubs"
 version = "0.1.3"
 description = "Stubs with type annotations for ordered-set Python library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -652,7 +652,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9e2377e42f8e1c7e4df1bf596e4f16cc34f6dddeac65fefe92a896e17a807fc2"
+content-hash = "4cdc578c8798e9910fa564e0e4ca516e108a30ba44794d9f6b399409d60912b2"
 
 [metadata.files]
 anyio = [
