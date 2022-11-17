@@ -126,6 +126,7 @@ class ProfanityFilter:
         self._nlps: Nlps = {}
         self._profane_word_dictionary_files: Dict[Language, Path] = {}
         self._spells: Spells = {}
+        self._cache_redis = None
 
         # For Levenshtein automata
         self._alphabet = set()
